@@ -169,10 +169,36 @@ alignement_perdant([E|R],J):-
 	lorsqu'un joueur J joue en coordonnees [L,C]
      */	
 
-% A FAIRE
 
+
+/* Version originale de replace
 replace([H|T], 1, X, [X|T]):- not(ground(H)). 
 replace([H|T], I, X, [H|R]):- I > -1, NI is I-1, replace(T, NI, X, R), !.
+*/
+
+
+%DEUX CHOIX, soit on veut tous les remplacements possibles ou on veut un remplacement à une position specifiée
+replace([],_,_,[]):- false. % Arreter les boucles 
+
+%Version avec position non determiné:
+replace([H|T], I, X, [X|T]):- 
+    var(I),
+    not(ground(H)).
+
+replace([H|T], I, X, [H|R]):- 
+    var(I),
+    replace(T, I, X, R).
+
+%Version avec une position determiné
+replace([H|T],P,X,[H|R]):-
+    not(var(P)),
+    PI is P-1,
+    replace(T,PI,X,R). 
+
+replace([H|T], I,X,[X|T]):- 
+    not(var(I)), 
+    I = 1,
+    not(ground(H)).
 
 
 %%%%%%% CHANGER!!! Il ne marche pas si on lui donne [L,C] inconnues!!!

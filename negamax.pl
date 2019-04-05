@@ -117,10 +117,30 @@ A FAIRE : commenter chaque litteral de la 2eme clause de loop_negamax/5,
 	- le meilleur dans une liste [X|L] avec L \= [], est obtenu en comparant
 	  X et Y,le meilleur couple de L 
 	  Entre X et Y on garde celui qui a la petite valeur de V.
+*/
 
-A FAIRE : ECRIRE ici les clauses de meilleur/2
-	*/
+%ATTENTION au moment de debugger, meilleur/2 analyse la liste du dernier élément au prémier
+meilleur([],[_,100]). %100 pour simuler une valeur haute
+meilleur([  [ [X,Y],V ] | L  ], [  [XF,YF],VF  ]):-
+	meilleur(L, [  [XNew,YNew],VNew  ]),	
+	(V < VNew -> XF is X, YF is Y, VF is V		%On garde la nouvelle valeur si elle est inferieur
+    ; XF is XNew, YF is YNew, VF is VNew). 		%La valeur anterieur reste
 
+/* Ici une version sans structure de control If -> Then ; Else, mais elle returne un False en extra
+meilleur([[[X,Y],V]|L],[[XF,YF],VF]):-
+	meilleur(L,[_,VNew]),
+	V < VNew,
+    XF is X, 
+    YF is Y, 
+    VF is V.
+    
+meilleur([[_,V]|L],[[XF,YF],VF]):-
+	meilleur(L,[[XNew,YNew],VNew]),
+	V >= VNew,
+    XF is XNew, 
+    YF is YNew, 
+    VF is VNew.
+*/
 
 
 	/******************

@@ -24,7 +24,7 @@
 	La situation initiale est une "matrice" 3x3 (liste de 3 listes de 3 termes chacune)
 	o� chacun des 9 termes est une variable libre.	
 	*/
-%:-lib(listut).
+:-lib(listut).
 situation_initiale([ [_,_,_],
                      [_,_,_],
                      [_,_,_] ]).
@@ -178,36 +178,54 @@ replace([H|T], I, X, [H|R]):- I > -1, NI is I-1, replace(T, NI, X, R), !.
 
 
 %DEUX CHOIX, soit on veut tous les remplacements possibles ou on veut un remplacement à une position specifiée
-replace([],_,_,[]):- false. % Arreter les boucles 
+% replace([],_,_,[]):- false. % Arreter les boucles 
 
-%Version avec position non determiné:
-replace([H|T], I, X, [X|T]):- 
-    var(I),
-    not(ground(H)).
+% %Version avec position non determiné:
+% replace([H|T], I, X, [X|T]):- 
+%     var(I),
+%     not(ground(H)).
 
-replace([H|T], I, X, [H|R]):- 
-    var(I),
-    replace(T, I, X, R).
+% replace([H|T], I, X, [H|R]):- 
+%     var(I),
+%     replace(T, I, X, R).
 
-%Version avec une position determiné
-replace([H|T],P,X,[H|R]):-
-    not(var(P)),
-    PI is P-1,
-    replace(T,PI,X,R). 
+% %Version avec une position determiné
+% replace([H|T],P,X,[H|R]):-
+%     not(var(P)),
+%     PI is P-1,
+%     replace(T,PI,X,R). 
 
-replace([H|T], I,X,[X|T]):- 
-    not(var(I)), 
-    I = 1,
-    not(ground(H)).
+% replace([H|T], I,X,[X|T]):- 
+%     not(var(I)), 
+%     I = 1,
+%     not(ground(H)).
 
+% mreplace(Ligne, Pos, Compteur_de_colonne, NewVal, Resultat).
+mreplace([DLigne | RLigne], Pos, Pos, NewVal, [NewVal | RLigne]):-	var(DLigne).
+mreplace([DLigne | RLigne], Pos, Cmpt, NewVal, [DLigne | RRes]):-
+	Cmpt1 is Cmpt + 1,
+	mreplace(RLigne, Pos, Cmpt1, NewVal, RRes).
+
+replace(Source, Pos, NewVal, Result):- mreplace(Source, Pos, 1, NewVal, Result).
 
 %%%%%%% CHANGER!!! Il ne marche pas si on lui donne [L,C] inconnues!!!
-successeur(_,[],_,[],_).
-successeur(J,[Ligne_etat|Reste_etat],[L,C],[Ligne_resultat|Reste_resultat], Niveau) :- 
-	( Niveau \= L -> Ligne_resultat = Ligne_etat, NiveauProchain is Niveau + 1, successeur(J,Reste_etat,[L,C],Reste_resultat, NiveauProchain)
-	;
-	replace(Ligne_etat,C,J,Ligne_resultat), Reste_resultat = Reste_etat
-	).
+% successeur(_,[],_,[],_).
+% successeur(J,[Ligne_etat|Reste_etat],[L,C],[Ligne_resultat|Reste_resultat], Niveau) :- 
+% 	( Niveau \= L -> Ligne_resultat = Ligne_etat, NiveauProchain is Niveau + 1, successeur(J,Reste_etat,[L,C],Reste_resultat, NiveauProchain)
+% 	;
+% 	replace(Ligne_etat,C,J,Ligne_resultat), Reste_resultat = Reste_etat
+% 	).
+
+% msuccesseur(Joueur, Etat_actuel, Position[L,C], Ligne, Resultat)
+msuccesseur(Joueur, [DEtat | REtat], [Ligne,C], Ligne, [DRes | REtat]):-
+	replacer(DEtat, C, Joueur, DRes).
+
+ msuccesseur(Joueur, [DEtat | REtat], [L,C], Ligne, [DEtat | RRes]):-
+	Ligne1 is Ligne + 1,
+	msuccesseur(Joueur, REtat, [L,C], Ligne1, RRes).
+
+successeur(Joueur, Etat, Pos, Result):- msuccesseur(Joueur, Etat, Pos, 1, Result).
+
 
 /* Ceci ne veut pas marcher bien
 successeur1(_,[],_,[],_).
@@ -231,19 +249,17 @@ successeur1(J,[LE|RE],[L,C],[LR|RR],N):-
 */
 
 
-heuristique(J,Situation,H) :-		% cas 1
-   H = 10000,				% grand nombre approximant +infini
+heuristique(J,Situation,inf) :-		% cas 1
+				% grand nombre approximant +infini
    alignement(Alig,Situation),
    alignement_gagnant(Alig,J), !.
 	
-heuristique(J,Situation,H) :-		% cas 2
-   H = -10000,				% grand nombre approximant -infini
+heuristique(J,Situation,-inf) :-		% cas 2				% grand nombre approximant -infini
    alignement(Alig,Situation),
    alignement_perdant(Alig,J),!.	
 
-
 % on ne vient ici que si les cut precedents n'ont pas fonctionne,
-% c-a-d si Situation n'est ni perdante ni gagnante.
+% c-a-d si Situation n'est ni perdante ni gagnante
 
 % A FAIRE 					cas 3
 heuristique(J,Situation,H):-

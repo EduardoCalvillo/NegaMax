@@ -5,7 +5,7 @@
 	negamax) et l'illustre sur le jeu du TicTacToe (morpion 3x3)
 	*/
 	
-%:- [tictactoe].
+:- [tictactoe].
 
 
 	/****************************************************
@@ -59,7 +59,34 @@ A FAIRE : ECRIRE ici les clauses de negamax/5
 .....................................
 	*/
 
+%cas 1 profondeur maximale atteinte
+negamax(J, Etat, Pmax, Pmax, [_, Val]):-
+	heuristique(J, Etat, Val).
+/*
+	2/ la profondeur maximale n'est pas  atteinte mais J ne
+	peut pas jouer ; au TicTacToe un joueur ne peut pas jouer
+	quand le tableau est complet (totalement instancie) ;
+	il n'y a pas de coup a jouer (Coup = rien)
+	et l'evaluation de Etat est faite par l'heuristique.
 
+
+*/
+
+negamax(J, Etat, _P, _Pmax, [_| Val]):-
+	ground(Etat),
+	heuristique(J, Etat, Val).
+
+
+
+% negamax(+J, +Etat, +P, +Pmax, [?Coup, ?Val])
+	% loop_negamax(+J,+P,+Pmax,+Successeurs,?Liste_Couples)
+	% meilleur(+Liste_de_Couples, ?Meilleur_Couple)
+negamax(J, Etat, P, Pmax, [Coup, V2]) :-
+    successeurs(J, Etat, Succ),
+    loop_negamax(J, P, Pmax, Succ, Liste_Couples),
+	meilleur(Liste_Couples, [Coup, V1]),
+	V2 is -V1.
+    % [Coup, Val]=Meilleur_Couple.
 	/*******************************************
 	 DEVELOPPEMENT D'UNE SITUATION NON TERMINALE
 	 successeurs/3 
@@ -75,7 +102,7 @@ A FAIRE : ECRIRE ici les clauses de negamax/5
 successeurs(J,Etat,Succ) :-
 	copy_term(Etat, Etat_Suiv),
 	findall([Coup,Etat_Suiv],
-		    successeur(J,Etat,Coup,Etat_Suiv,1),
+		    successeur(J,Etat,Coup,Etat_Suiv),
 		    Succ).
 
 	/*************************************
@@ -95,6 +122,9 @@ loop_negamax(J,P,Pmax,[[Coup,Suiv]|Succ],[[Coup,Vsuiv]|Reste_Couples]) :-
 	adversaire(J,A),
 	Pnew is P+1,
 	negamax(A,Suiv,Pnew,Pmax, [_,Vsuiv]).
+
+
+
 
 	/*
 
@@ -146,10 +176,9 @@ meilleur([[_,V]|L],[[XF,YF],VF]):-
 	/******************
   	PROGRAMME PRINCIPAL
   	*******************/
-
+% negamax(+J, +Etat, +P, +Pmax, [?Coup, ?Val])
 main(B,V, Pmax) :-
-
-	true.        
+	negamax(x, B, 1, Pmax, V).
 
 
 	/*

@@ -227,14 +227,6 @@ msuccesseur(Joueur, [DEtat | REtat], [Ligne,C], Ligne, [DRes | REtat]):-
 successeur(Joueur, Etat, Pos, Result):- msuccesseur(Joueur, Etat, Pos, 1, Result).
 
 
-/* Ceci ne veut pas marcher bien
-successeur1(_,[],_,[],_).
-successeur1(J,[LE|RE],[L,C],[LR|RR],L):-
-    replace(LE,C,J,LR), RR = RE.
-successeur1(J,[LE|RE],[L,C],[LR|RR],N):-
-    Np is N+1, LR = LE, successeur1(J,RE,[L,C],RR,Np).
-*/
-
 	/**************************************
    	 EVALUATION HEURISTIQUE D'UNE SITUATION
   	 **************************************/
@@ -267,7 +259,7 @@ heuristique(J,Situation,H):-
     heuristiqueP(J,L,H).
 
 heuristiqueP(_,[],0).
-heuristiqueP(J,[L|S],H) :-  %Attention je boucle avec chaque Ligne!! pas avec chaque alignement
+heuristiqueP(J,[L|S],H) :-  
      heuristiqueP(J,S,Hnew),
     adversaire(J,A),
     (   possible(L,J) , not(possible(L,A))->  %Seul Joeur possible

@@ -24,7 +24,7 @@
 	La situation initiale est une "matrice" 3x3 (liste de 3 listes de 3 termes chacune)
 	o� chacun des 9 termes est une variable libre.	
 	*/
-:-lib(listut).
+%:-lib(listut).
 situation_initiale([ [_,_,_],
                      [_,_,_],
                      [_,_,_] ]).
@@ -218,7 +218,7 @@ replace(Source, Pos, NewVal, Result):- mreplace(Source, Pos, 1, NewVal, Result).
 
 % msuccesseur(Joueur, Etat_actuel, Position[L,C], Ligne, Resultat)
 msuccesseur(Joueur, [DEtat | REtat], [Ligne,C], Ligne, [DRes | REtat]):-
-	replacer(DEtat, C, Joueur, DRes).
+	replace(DEtat, C, Joueur, DRes).
 
  msuccesseur(Joueur, [DEtat | REtat], [L,C], Ligne, [DEtat | RRes]):-
 	Ligne1 is Ligne + 1,

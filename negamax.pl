@@ -5,7 +5,7 @@
 	negamax) et l'illustre sur le jeu du TicTacToe (morpion 3x3)
 	*/
 	
-:- [tictactoe].
+:- include(tictactoeINSA).
 
 
 	/****************************************************
@@ -148,9 +148,8 @@ A FAIRE : commenter chaque litteral de la 2eme clause de loop_negamax/5,
 	  X et Y,le meilleur couple de L 
 	  Entre X et Y on garde celui qui a la petite valeur de V.
 */
-
 %ATTENTION au moment de debugger, meilleur/2 analyse la liste du dernier élément au prémier
-meilleur([],[_,100]). %100 pour simuler une valeur haute
+meilleur([  [ [X,Y],V]| []  ],[[X,Y],V]). %100 pour simuler une valeur haute
 meilleur([  [ [X,Y],V ] | L  ], [  [XF,YF],VF  ]):-
 	meilleur(L, [  [XNew,YNew],VNew  ]),	
 	(V < VNew -> XF is X, YF is Y, VF is V		%On garde la nouvelle valeur si elle est inferieur
@@ -177,8 +176,8 @@ meilleur([[_,V]|L],[[XF,YF],VF]):-
   	PROGRAMME PRINCIPAL
   	*******************/
 % negamax(+J, +Etat, +P, +Pmax, [?Coup, ?Val])
-main(B,V, Pmax) :-
-	negamax(x, B, 1, Pmax, V).
+main(J,B,V, Pmax) :-
+	negamax(J, B, 1, Pmax, V),!.
 
 
 	/*
